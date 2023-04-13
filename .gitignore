@@ -1,0 +1,9 @@
+*.shp
+*.dbf
+*.shx
+*.prj
+*.gdb
+*.tif
+*.tiff
+.env
+__pycache__/
