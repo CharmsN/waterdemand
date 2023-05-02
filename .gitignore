@@ -8,4 +8,6 @@
 .env
 __pycache__/
 .ipynb_checkpoints
-/S2A_MSIL2A_20190724T112121_N0213_R037_T30UWB_20190724T123805.SAFE/
+.SAFE/
+Tutorial_CN_Copy5_checkpoint.ipynb
+Tutorial_CN_Copy2_checkpoint.ipynb
