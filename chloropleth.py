@@ -78,8 +78,9 @@ def chloropleth_pcc(pcc_period):
     plt.ylabel('Latitude')
     # Adjust the spacing between the title and the axis labels
     plt.subplots_adjust(bottom=0.175)
-    # Show the plot
+    
+    return plt # Show the plot
     # plt.show()
     # Save the plot as a JPEG file
-    plt.savefig('data_files/pcc.jpg', dpi=300)
+    # plt.savefig('data_files/pcc.jpg', dpi=300)
     
