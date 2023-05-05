@@ -59,7 +59,7 @@ merged_landuse = merged_landuse.drop(['CODE_18', 'CODE', 'Unnamed: 4', 'Unnamed:
 merged_landuse
 # Access the 'LABEL' column in the merged DataFrame - LABEL gives the actual landuse description
 label_column = merged_landuse['LABEL']
-print(merged_landuse.crs == wrz.crs) # test if the crs is the same 
+# print(merged_landuse.crs == wrz.crs) # test if the crs is the same # uncomment to check if the crs for both gdf's are the same 
 # Perform spatial join between wrz and merged_landuse
 join = gpd.sjoin(wrz, merged_landuse, how='inner', predicate='intersects')
 # Group by COMPANY and LABEL, and sum the Area_Ha column
