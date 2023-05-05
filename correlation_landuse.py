@@ -14,7 +14,7 @@ wrz = wrz.drop(columns=columns_to_remove)
 
 # Append Correlation data to the wrz geodataframe
 # Load the CSV file
-correlation_data = pd.read_csv('data_files/correlation_data.csv')  
+correlation_data = pd.read_csv('data_files/correlation_data.csv')
 
 # Perform the merge
 correlate = wrz.merge(correlation_data[['Company', 'hh_cons', 'hh_pop']], how='left', left_on='Acronym', right_on='Company')
@@ -35,7 +35,7 @@ list2 = correlate['hh_cons']
 
 # Apply the pearsonr()
 corr, _ = pearsonr(list1, list2)
-print('Pearsons correlation: %.3f' % corr)
+# print('Pearsons correlation: %.3f' % corr)
 
 # Convert dataframe into series
 list1 = correlate['hh_pop']
@@ -43,7 +43,7 @@ list2 = correlate['hh_cons']
 
 # Apply the pearsonr()   # This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 corr, _ = pearsonr(list1, list2)
-print('Pearsons correlation: %.3f' % corr)
+# print('Pearsons correlation: %.3f' % corr)
 
 # Load landuse data
 landuse = gpd.read_file(os.path.abspath('data_files/clc2018_uk.shp'))
@@ -106,7 +106,7 @@ print('Pearsons correlation for Household Population (000s) and Urban Landuse (H
 
 # household consumption (megalitres per day) divided by Area (Hectares) and converted to Litres per Hectare to give Household consumption per Hectare in Litres per day for land classed as 'urban use'
 correlate_landuse['hh_cons_per_Area_Ha'] = correlate_landuse['hh_cons'] * 10**6 / 86400 / correlate_landuse['Area_Ha'] * 10000
-print('Household Water Consumption (Litres per day) per Hectare of Land Classified under 'Urban' Landuser (: %.3f' % correlate_landuse)
+print('Household Water Consumption (Litres per day) per Hectare of Land Classified under Urban Landuse :', correlate_landuse)
 # average household property size in the UK is around 120m 
 
 
