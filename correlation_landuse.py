@@ -12,7 +12,10 @@ columns_to_remove = ['Disclaimer', 'Disclaim2', 'Disclaim3', 'Provenance', 'Lice
 # Drop the columns from the GeoDataFrame
 wrz = wrz.drop(columns=columns_to_remove)
 
-included_area_types = ['regional water and sewerage company', 'regional water only company'] # reduce the dataset to only water companies (ie excude NAVs)
+included_area_types = ['regional water and sewerage company', 'regional water only company'] # Filter the GeoDataFrame to select the features with "Northumbrian Water"
+
+wrz['COMPANY'] = wrz['COMPANY'].replace('Northumbrian Water Limited', 'Northumbrian Water') # fix issue with NES record
+
 # Filter out features with the specified area types
 wrz_ref = wrz[wrz['CoType'].isin(included_area_types)]
  # len(wrz_ref) # uncomment this to check that all 43 water company areas are included 
