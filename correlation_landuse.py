@@ -7,21 +7,45 @@ from scipy.stats import pearsonr
 # Load water company data as wrz, remove unnecessary columns
 wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
 # List of columns to be removed
-columns_to_remove = ['Disclaimer', 'Disclaim2', 'Disclaim3', 'Provenance', 'Licence', 'WARNINGS', 'Revisions']
+columns_to_remove = ['Disclaimer', 'Disclaim2', 'Disclaim3', 'Provenance', 'Licence', 'WARNINGS', 'Revisions', 'AreaServed']
 
 # Drop the columns from the GeoDataFrame
 wrz = wrz.drop(columns=columns_to_remove)
 
+included_area_types = ['regional water and sewerage company', 'regional water only company'] # reduce the dataset to only water companies (ie excude NAVs)
+# Filter out features with the specified area types
+wrz_ref = wrz[wrz['CoType'].isin(included_area_types)]
+ # len(wrz_ref) # uncomment this to check that all 43 water company areas are included 
+
+# this section is to create merge the polygons from the various water companies so that there is one record for each water company so we can append the hh_pop and hh_cons data
+# Group the data by the 'Company' column
+grouped_wrz = wrz.groupby('COMPANY')
+
+# Create an empty GeoSeries to store the unioned geometries
+merged_geometries = gpd.GeoSeries()
+acronyms = []
+
+# Iterate over each group and perform the union operation
+for group_name, group_data in grouped_wrz:
+    unioned_geometry = group_data['geometry'].unary_union
+    merged_geometries[group_name] = unioned_geometry
+    acronyms.append(group_data['Acronym'].iloc[0]) # this is added as the Acronym colum which required later for the merge is dropped - this replaces it 
+    
+# Create a new GeoDataFrame with the unioned geometries for each company
+merged_wrz_companies = gpd.GeoDataFrame(geometry=merged_geometries.values, index=merged_geometries.index)
+merged_wrz_companies['COMPANY'] = merged_geometries.index
+merged_wrz_companies['Acronym'] = acronyms
+
+merged_wrz_companies
+
 # Append Correlation data to the wrz geodataframe
 # Load the CSV file
-correlation_data = pd.read_csv('data_files/correlation_data.csv')
+correlation_data = pd.read_csv('data_files/correlation_data.csv', thousands=',')  
 
 # Perform the merge
 correlate = wrz.merge(correlation_data[['Company', 'hh_cons', 'hh_pop']], how='left', left_on='Acronym', right_on='Company')
 
-# Drop the unnecessary columns & rename the merged column
-correlate.drop(['Company'], axis=1, inplace=True)
-
+##this is where the error is occuring....all features where the hh_cons or hh_pop are greater than 999.99 are being considered as NaN 
 # Convert the hh_pop and hh_cons columns to numeric
 correlate['hh_pop'] = pd.to_numeric(correlate['hh_pop'], errors='coerce')
 correlate['hh_cons'] = pd.to_numeric(correlate['hh_cons'], errors='coerce')
