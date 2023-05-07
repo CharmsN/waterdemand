@@ -7,12 +7,12 @@ import shapely
 import os
 from PIL import Image
 
-def download_best_overlap_image(company_name):
+def download_best_overlap_image(company_detail,date_start,date_end,img_name):
     # Load water company data as wrz, remove unnecessary columns
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
     
     # select water company to review in further detail:
-    selected_company_gdf = wrz[wrz['AreaServed'] == company_name]
+    selected_company_gdf = wrz[wrz['AreaServed'] == company_detail]
 
     # get the outline of the selected water company:
     company_outline = selected_company_gdf['geometry']
@@ -40,16 +40,18 @@ def download_best_overlap_image(company_name):
 
     #retrieve images for 10% cloud cover, date range 1 April 2019 to 31 March 2020 
     products = api.query(search_area.wkt, # use the WKT representation of our search area
-                     date=('20190401', '20200331'), # all images from February 2023
+                     date=(date_start,date_end), # all images from February 2023
                      platformname='Sentinel-2', # the platform name is Sentinel-2
                      producttype='S2MSI2A', # surface reflectance product (L2A)
                      cloudcoverpercentage=(0, 10)) # limit to 10% cloud cover
     # Determine the number of images retrieved
     nresults = len(products) # get the number of results found
     print('Found {} results'.format(nresults)) # show the number of results found 
+    if nresults == 0:
+        print('No images in this range')
 
-    results = list(products)[1] # gets the second item from the dict
-    # products[results] # show the metadata for the second item
+    results = next(iter(products)) # gets the second item from the dict
+    products[results] # show the metadata for the second item
 
     qlook = api.download_quicklook(results) # download the quicklook image for this first result 
     display.Image(qlook['path']) # display the image 
@@ -69,17 +71,22 @@ def download_best_overlap_image(company_name):
     # print(max_index) 
 
     best_overlap = product_geo.inbest_overlap = product_geo.index[max_index] # get the actual index (image name) with the largest overlap
-   # download the quicklook image for the best overlap
-    qlook = api.download_quicklook(best_overlap)
+    # download the quicklook image for the best overlap
+    # qlook = api.download_quicklook(best_overlap)
 
     # create an Image object from the downloaded image file
-    img = Image.open(qlook['path'])
+    # img = Image.open(qlook['path'])
 
     # save the Image object as PNG with the desired file name and location
-    img.save('data_files/img.png')
+    # img.save('data_files/img.png')
     
     # download best image
-    # api.download(best_overlap) # downloads the best result
+    api.download(best_overlap) # downloads the best result
     # api.download(firest_result, 
     #    nodefilter=make_path_filter("*_B*.jp2")) # only downloads the image bands
+    
+    # Get the name of the downloaded image
+    image_name = api.get_product_odata(best_overlap)['title']
+    
+    print('Downloaded image: {}'.format(image_name))
     
