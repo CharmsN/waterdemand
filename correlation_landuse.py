@@ -132,11 +132,10 @@ list3 = correlate_landuse['Area_Ha']
 corr, _ = pearsonr(list2, list3)
 print('Pearsons correlation for Household Population (000s) and Urban Landuse (Ha): %.3f' % corr)
 
-# Add a hard return
-#print()
-
 # household consumption (megalitres per day) divided by Area (Hectares) and converted to Litres per Hectare to give Household consumption per Hectare in Litres per day for land classed as 'urban use'
 correlate_landuse['hh_cons_per_Area_Ha'] = correlate_landuse['hh_cons'] * 10**6 / 86400 / correlate_landuse['Area_Ha'] * 10000
+
+correlate_landuse  
 
 
 
