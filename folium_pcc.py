@@ -6,6 +6,8 @@ import folium
 def folium_pcc_map(): 
 
     """
+    This function requires os, pandas, geopandas and folium to run
+
     Creates a Folium map showing the PCC (per capita consumption) data for water companies. This is hardcoded. To create a Folium map for
     other data use function module folium_map in std_folium_map located in the waterdemand Github repository.
 
