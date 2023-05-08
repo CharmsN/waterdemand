@@ -1,21 +1,10 @@
 import os
 import pandas as pd
-import numpy as np
 import geopandas as gpd
-import matplotlib.pyplot as plt
-from cartopy.feature import ShapelyFeature
-import cartopy.crs as ccrs
-import matplotlib.patches as mpatches
-import matplotlib.lines as mlines
 import folium
-import scipy
-import seaborn as sns
 
 def folium_pcc_map(): 
-    
-    # Set Seaborn style and color palette
-    sns.set_style("darkgrid")
-    sns.set_palette("husl")
+
 
     # Load water company data as wrz, remove unnecessary columns
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
