@@ -6,7 +6,24 @@ import cartopy.crs as ccrs
 
 def chloropleth_pcc(pcc_period):
 
+    """Generates a chloropleth map depicting the average per capita consumption (PCC) of water within different water company areas
+    for a specific time period. 
 
+    The function requires the following imports: 
+    import os
+    import pandas as pd
+    import geopandas as gpd
+    import matplotlib.pyplot as plt
+    import cartopy.crs as ccrs
+
+    This function is hard-coded with the following: Water company boundaries - can be downloaded from the following link: https://data.parliament.uk/resources/constituencystatistics/water/WaterSupplyAreas_incNAVsv1_4.zip. Consumption data - can be
+downloaded from https://www.ofwat.gov.uk/publication/historical-performance-trends-for-pr24-v2-0/ and a shape file that defines the outline for the UK. All datasets are provided in the waterdemand Github repository. (Note: The code could also be amended to visualise total household consumption, leakage etc as this information is also available within the provided dataset. Further nhancement to this code would be to create a template that could be populated with the required data to allow visualisation a district metered area (dma) within a water company boundary. )
+
+    The function loads geographical and statistical data, merges them based on water company acronyms, and creates a chloropleth map using the GeoDataFrame. The map showcases the variation in PCC across different areas, helping to visualize the differences in water consumption patterns.
+
+    The input for this function is is string called pcc_period: The specific time period for which the PCC data is being visualized. Options for this are in the format '2019-20', '2011-12' etc. 
+
+    The function returns plt: The plot object representing the chloropleth map, which displays the average per capita consumption per water company area for the selected period."""
 
     outline = gpd.read_file(os.path.abspath('data_files/Outline.shp')) # load the outline of UK for a backdrop
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp')) # Load water company data as wrz, remove unnecessary columns
