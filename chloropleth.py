@@ -1,29 +1,12 @@
 import os
 import pandas as pd
-import numpy as np
 import geopandas as gpd
 import matplotlib.pyplot as plt
-from cartopy.feature import ShapelyFeature
 import cartopy.crs as ccrs
-import matplotlib.patches as mpatches
-import matplotlib.lines as mlines
-import folium
-import scipy
-import seaborn as sns
-from sentinelsat import SentinelAPI, make_path_filter
-from IPython import display
-import shapely
-from shapely.geometry import MultiPolygon
-#import add_axis_scalebar as add_axis_elements
-from csv_merge import merge_csv_to_wrz
-import download_sat_image_company
-from IPython.display import Image
 
 def chloropleth_pcc(pcc_period):
 
-    # Set Seaborn style and color palette
-    sns.set_style("darkgrid")
-    sns.set_palette("husl")
+
 
     outline = gpd.read_file(os.path.abspath('data_files/Outline.shp')) # load the outline of UK for a backdrop
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp')) # Load water company data as wrz, remove unnecessary columns
@@ -56,5 +39,5 @@ def chloropleth_pcc(pcc_period):
     return plt # Show the plot
     # plt.show()
     # Save the plot as a JPEG file
-    # plt.savefig('data_files/pcc.jpg', dpi=300)
+    # plt.savefig('data_files/pcc.jpg', dpi=300)  # incomment this to save a jpeg of this plot
     
