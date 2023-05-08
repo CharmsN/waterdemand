@@ -7,7 +7,21 @@ import shapely
 import os
 from PIL import Image
 
-def download_best_overlap_image(company_detail,date_start,date_end,img_name):
+   """
+    Downloads the best overlapping image for a given water company within a specified date range.
+
+    Parameters:
+        company_detail (str): The name of the water company. This is the AreaServed column in the dataset that is provided as example.
+        date_start (str): The start date of the date range in the format 'YYYYMMDD'.
+        date_end (str): The end date of the date range in the format 'YYYYMMDD'.
+
+    Returns:
+        None
+    The code to download all matches must be uncommented if the results are to be downloaded.
+    """
+
+def download_best_overlap_image(company_detail,date_start,date_end):
+    
     # Load water company data as wrz, remove unnecessary columns
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
     
@@ -70,23 +84,8 @@ def download_best_overlap_image(company_detail,date_start,date_end,img_name):
     max_index = product_geo.overlap.argmax() # get the integer location of the largest overlap value
     # print(max_index) 
 
-    best_overlap = product_geo.inbest_overlap = product_geo.index[max_index] # get the actual index (image name) with the largest overlap
-    # download the quicklook image for the best overlap
-    # qlook = api.download_quicklook(best_overlap)
-
-    # create an Image object from the downloaded image file
-    # img = Image.open(qlook['path'])
-
-    # save the Image object as PNG with the desired file name and location
-    # img.save('data_files/img.png')
-    
-    # download best image
-    api.download(best_overlap) # downloads the best result
-    # api.download(firest_result, 
-    #    nodefilter=make_path_filter("*_B*.jp2")) # only downloads the image bands
-    
-    # Get the name of the downloaded image
-    image_name = api.get_product_odata(best_overlap)['title']
-    
-    print('Downloaded image: {}'.format(image_name))
+    #uncomment this section only if you want to download the results for all matches
+    # api.download_all(products,
+                 #n_concurrent_dl=5, # allow up to 5 concurrent downloads
+                 #nodefilter=make_path_filter("*_B*.jp2")) # only down the image bands (optional)
     
