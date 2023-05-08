@@ -1,15 +1,10 @@
 import os
-import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
-from cartopy.feature import ShapelyFeature
 import cartopy.crs as ccrs
-import seaborn as sns
 
 def wrz_boundaries(company_data):
-    # Set Seaborn style and color palette 
-    sns.set_style("darkgrid")
-    sns.set_palette("husl")
+
 
     # Load water company data
     wrz = gpd.read_file(os.path.abspath(company_data))
