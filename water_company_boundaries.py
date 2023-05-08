@@ -34,7 +34,7 @@ def wrz_boundaries(company_data):
     myCRS = ccrs.TransverseMercator(27700)
 
     wrz.plot(column='COMPANY', cmap='viridis', linewidth=0.8, edgecolor='black', legend=True, label='COMPANY', figsize=(20,20))
-    plt.suptitle('Figure x: Boundaries for Water companies in England and Wales', y=0.1, fontsize=14)
+    plt.suptitle('Figure 2: Boundaries for Water companies in England and Wales', y=0.1, fontsize=14)
     # Add a border around the map
     for spine in plt.gca().spines.values():
         spine.set_visible(True)
@@ -44,5 +44,9 @@ def wrz_boundaries(company_data):
     plt.xlabel('Longitude')
     plt.ylabel('Latitude')
     plt.subplots_adjust(bottom=0.15)
+    
+    # Save the plot as an image file
+    output_file = 'data_files/wrz.png'  # Specify the desired file path and name
+    plt.savefig(output_file)
  
     return plt
