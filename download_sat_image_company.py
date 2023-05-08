@@ -1,26 +1,21 @@
 import geopandas as gpd
-import cartopy.crs as ccrs
-import matplotlib.patches as mpatches
 from sentinelsat import SentinelAPI, make_path_filter
 from IPython import display
-import shapely
 import os
-from PIL import Image
 
-   """
+def download_best_overlap_image(company_detail,date_start,date_end):
+    """
     Downloads the best overlapping image for a given water company within a specified date range.
 
-    Parameters:
+    Inputs:
         company_detail (str): The name of the water company. This is the AreaServed column in the dataset that is provided as example.
         date_start (str): The start date of the date range in the format 'YYYYMMDD'.
         date_end (str): The end date of the date range in the format 'YYYYMMDD'.
 
-    Returns:
+    Outputs:
         None
     The code to download all matches must be uncommented if the results are to be downloaded.
     """
-
-def download_best_overlap_image(company_detail,date_start,date_end):
     
     # Load water company data as wrz, remove unnecessary columns
     wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
@@ -85,7 +80,7 @@ def download_best_overlap_image(company_detail,date_start,date_end):
     # print(max_index) 
 
     #uncomment this section only if you want to download the results for all matches
-    # api.download_all(products,
+    #api.download_all(products,
                  #n_concurrent_dl=5, # allow up to 5 concurrent downloads
                  #nodefilter=make_path_filter("*_B*.jp2")) # only down the image bands (optional)
     
