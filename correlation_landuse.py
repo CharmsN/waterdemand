@@ -2,7 +2,9 @@ import os
 import pandas as pd
 import geopandas as gpd
 import pandas as pd
+import numpy as np
 from scipy.stats import pearsonr
+from shapely.ops import unary_union
 
 # Load water company data as wrz, remove unnecessary columns
 wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
@@ -19,8 +21,7 @@ wrz['COMPANY'] = wrz['COMPANY'].replace('Northumbrian Water Limited', 'Northumbr
 # Filter out features with the specified area types
 wrz_ref = wrz[wrz['CoType'].isin(included_area_types)]
  # len(wrz_ref) # uncomment this to check that all 43 water company areas are included 
-
-# this section is to create merge the polygons from the various water companies so that there is one record for each water company so we can append the hh_pop and hh_cons data
+wrz_ref
 # Group the data by the 'Company' column
 grouped_wrz = wrz.groupby('COMPANY')
 
@@ -32,29 +33,36 @@ acronyms = []
 for group_name, group_data in grouped_wrz:
     unioned_geometry = group_data['geometry'].unary_union
     merged_geometries[group_name] = unioned_geometry
-    acronyms.append(group_data['Acronym'].iloc[0]) # this is added as the Acronym colum which required later for the merge is dropped - this replaces it 
-    
+    acronyms.append(group_data['Acronym'].iloc[0])
 # Create a new GeoDataFrame with the unioned geometries for each company
 merged_wrz_companies = gpd.GeoDataFrame(geometry=merged_geometries.values, index=merged_geometries.index)
 merged_wrz_companies['COMPANY'] = merged_geometries.index
 merged_wrz_companies['Acronym'] = acronyms
 
 merged_wrz_companies
-
 # Append Correlation data to the wrz geodataframe
 # Load the CSV file
 correlation_data = pd.read_csv('data_files/correlation_data.csv', thousands=',')  
-
+correlation_data
 # Perform the merge
-correlate = wrz.merge(correlation_data[['Company', 'hh_cons', 'hh_pop']], how='left', left_on='Acronym', right_on='Company')
+correlate = merged_wrz_companies.merge(correlation_data[['Company', 'hh_cons', 'hh_pop']], how='left', left_on='Acronym', right_on='Company')
 
-##this is where the error is occuring....all features where the hh_cons or hh_pop are greater than 999.99 are being considered as NaN 
+correlate.to_file('data_files_correlate.shp')
+correlate
 # Convert the hh_pop and hh_cons columns to numeric
 correlate['hh_pop'] = pd.to_numeric(correlate['hh_pop'], errors='coerce')
 correlate['hh_cons'] = pd.to_numeric(correlate['hh_cons'], errors='coerce')
 
 # Filter out NaN values
 correlate = correlate.dropna()
+correlate
+# Convert dataframe into series
+list1 = correlate['hh_pop']
+list2 = correlate['hh_cons']
+
+# Apply the pearsonr()
+corr, _ = pearsonr(list1, list2)
+print('Pearsons correlation: %.3f' % corr)
 
 # Convert dataframe into series
 list1 = correlate['hh_pop']
@@ -62,15 +70,9 @@ list2 = correlate['hh_cons']
 
 # Apply the pearsonr()
 corr, _ = pearsonr(list1, list2)
-# print('Pearsons correlation: %.3f' % corr)
+print('Pearsons correlation: %.3f' % corr)
 
-# Convert dataframe into series
-list1 = correlate['hh_pop']
-list2 = correlate['hh_cons']
-
-# Apply the pearsonr()   # This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
-corr, _ = pearsonr(list1, list2)
-# print('Pearsons correlation: %.3f' % corr)
+# This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 
 # Load landuse data
 landuse = gpd.read_file(os.path.abspath('data_files/clc2018_uk.shp'))
@@ -98,11 +100,9 @@ company_landuse = gpd.GeoDataFrame(grouped, geometry=gpd.GeoSeries(), crs=wrz.cr
 
 # Set the geometry of the new GeoDataFrame to the centroid of each LABEL
 company_landuse.geometry = company_landuse.apply(lambda x: wrz[wrz['COMPANY'] == x['COMPANY']].geometry.centroid.iloc[0], axis=1)
-
 # Filter the rows where LABEL includes 'urban'
 urban_company_landuse = company_landuse[company_landuse['LABEL'].str.contains('urban')]
 urban_company_landuse
-
 # Group the rows by the COMPANY column and get the sum of the Area_Ha column for each group
 area_by_company = urban_company_landuse.groupby("COMPANY")["Area_Ha"].sum()
 
@@ -112,17 +112,19 @@ area_by_company = area_by_company.round(2)
 # Convert the result to a new GeoDataFrame with a "COMPANY" column and an "AreaHa" column
 area_by_company = area_by_company.reset_index()
 area_by_company.columns = ["COMPANY", "Area_Ha"]
-
+area_by_company
+correlate
 # Perform the merge
 correlate_landuse = correlate.merge(area_by_company[['COMPANY', 'Area_Ha']], how='left', left_on='COMPANY', right_on='COMPANY')
 
+correlate_landuse
 # Convert dataframe into series
 list2 = correlate_landuse['hh_cons']
 list3 = correlate_landuse['Area_Ha']
-
-# Apply the pearsonr()  # This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
+# Apply the pearsonr()
 corr, _ = pearsonr(list2, list3)
-print('Pearsons correlation for Household Water Consumption (Ml/d) and Urban Landuse (Ha): %.3f' % corr)
+print('Pearsons correlation: %.3f' % corr)
+
 
 # Convert dataframe into series
 list2 = correlate_landuse['hh_pop']
@@ -130,13 +132,11 @@ list3 = correlate_landuse['Area_Ha']
 
 # Apply the pearsonr()
 corr, _ = pearsonr(list2, list3)
-print('Pearsons correlation for Household Population (000s) and Urban Landuse (Ha): %.3f' % corr)
+print('Pearsons correlation: %.3f' % corr)
+
+# This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 
 # household consumption (megalitres per day) divided by Area (Hectares) and converted to Litres per Hectare to give Household consumption per Hectare in Litres per day for land classed as 'urban use'
 correlate_landuse['hh_cons_per_Area_Ha'] = correlate_landuse['hh_cons'] * 10**6 / 86400 / correlate_landuse['Area_Ha'] * 10000
-
-correlate_landuse  
-
-
-
-
+# average household property size in the UK is around 120m 
+correlate_landuse
