@@ -6,6 +6,48 @@ import numpy as np
 from scipy.stats import pearsonr
 from shapely.ops import unary_union
 
+"""
+This script processes water company data and land use data to analyze correlations between different variables.
+
+Inputs:
+- 'data_files/WaterSupplyAreas_incNAVs v1_4.shp': Shapefile containing water company data.
+- 'data_files/correlation_data.csv': CSV file containing correlation data.
+- 'data_files/clc2018_uk.shp': Shapefile containing land use data.
+- 'data_files/legend.csv': CSV file containing land use category labels.
+
+Outputs:
+- 'data_files_correlate.shp': Shapefile containing merged water company data with correlation information.
+
+Process:
+1. Loads water company data from the shapefile and removes unnecessary columns.
+2. Filters the data to select features with specific area types.
+3. Fixes an issue with a specific record in the 'COMPANY' column.
+4. Performs a union operation on the geometries based on the 'COMPANY' column.
+5. Creates a new GeoDataFrame with the unioned geometries for each company.
+6. Loads correlation data from a CSV file and merges it with the water company data.
+7. Converts specific columns to numeric values and filters out NaN values.
+8. Calculates the Pearson correlation coefficient between household population and household consumption.
+9. Loads land use data from a shapefile and merges it with a CSV file containing labels.
+10. Drops unnecessary columns from the merged land use data.
+11. Performs a spatial join between the water company data and merged land use data.
+12. Groups the data by company and land use label, summing the 'Area_Ha' column.
+13. Creates a new GeoDataFrame with the grouped data, setting the geometry as the centroid of each land use label.
+14. Filters the rows where the land use label includes 'urban'.
+15. Groups the rows by company and calculates the sum of the 'Area_Ha' column for each group.
+16. Rounds the values in the 'Area_Ha' column to 2 significant digits.
+17. Merges the water company data with the area by company data.
+18. Calculates the Pearson correlation coefficient between household consumption and area of urban land use.
+19. Calculates household consumption per hectare in liters per day for land classified as 'urban use'.
+20. Adds a new column to the data containing household consumption per hectare in liters per day.
+21. Returns the updated water company data with the additional column.
+
+Note: The code includes references to Amiya Rout's contributions on geeksforgeeks.org for the Pearson correlation calculation.
+
+Author: [Charmaine Newmarch]
+Date: [11 May 2023]
+"""
+
+
 # Load water company data as wrz, remove unnecessary columns
 wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
 # List of columns to be removed
@@ -62,15 +104,7 @@ list2 = correlate['hh_cons']
 
 # Apply the pearsonr()
 corr, _ = pearsonr(list1, list2)
-print('Pearsons correlation: %.3f' % corr)
-
-# Convert dataframe into series
-list1 = correlate['hh_pop']
-list2 = correlate['hh_cons']
-
-# Apply the pearsonr()
-corr, _ = pearsonr(list1, list2)
-print('Pearsons correlation: %.3f' % corr)
+print('Pearsons correlation for household population and household consumption: %.3f' % corr)
 
 # This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 
@@ -89,7 +123,7 @@ merged_landuse
 # Access the 'LABEL' column in the merged DataFrame - LABEL gives the actual landuse description
 label_column = merged_landuse['LABEL']
 merged_wrz_companies = merged_wrz_companies.set_crs(wrz.crs)
-print(merged_landuse.crs == merged_wrz_companies.crs) # test if the crs is the same 
+# print(merged_landuse.crs == merged_wrz_companies.crs) # test if the crs is the same 
 # Perform spatial join between wrz and merged_landuse
 join = gpd.sjoin(merged_wrz_companies, merged_landuse, how='inner', predicate='intersects')
 # Group by COMPANY and LABEL, and sum the Area_Ha column
@@ -121,22 +155,9 @@ correlate_landuse
 # Convert dataframe into series
 list2 = correlate_landuse['hh_cons']
 list3 = correlate_landuse['Area_Ha']
-# Apply the pearsonr()
-corr, _ = pearsonr(list2, list3)
-print('Pearsons correlation: %.3f' % corr)
-
-
-# Convert dataframe into series
-list2 = correlate_landuse['hh_pop']
-list3 = correlate_landuse['Area_Ha']
 
 # Apply the pearsonr()
 corr, _ = pearsonr(list2, list3)
-print('Pearsons correlation: %.3f' % corr)
+print('Pearsons correlation for household population and area urban landuse: %.3f' % corr)
 
-# This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
-
-# household consumption (megalitres per day) divided by Area (Hectares) and converted to Litres per Hectare to give Household consumption per Hectare in Litres per day for land classed as 'urban use'
-correlate_landuse['hh_cons_per_Area_Ha'] = correlate_landuse['hh_cons'] * 10**6 / 86400 / correlate_landuse['Area_Ha'] * 10000
-# average household property size in the UK is around 120m 
-correlate_landuse
+# The Pearson's Correlation Coefficient code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
