@@ -1,9 +1,8 @@
 import rasterio
 import numpy as np
 
+def stacking_bands_3:
 
-def band_stacking_three_bands(band_files,output_tiff,output_jpg):
-    
     # Create an empty array to store the band data
     stacked_data = []
 
@@ -37,4 +36,3 @@ def band_stacking_three_bands(band_files,output_tiff,output_jpg):
     # Write the data to the JPEG file
     with rasterio.open(output_jpg, 'w', driver='JPEG', width=profile['width'], height=profile['height'], count=profile['count'], dtype='uint8') as dst:
         dst.write(data)
-    
