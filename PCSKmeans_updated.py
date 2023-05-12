@@ -1,39 +1,3 @@
-PyCharm
-Community
-edition
-supports
-Jupyter
-notebooks in read - only
-mode, to
-get
-full
-support
-for local notebooks download and try PyCharm Professional now!
-
-Try
-DataSpell — a
-dedicated
-IDE
-for data science,
-    with full support for local and remote notebooks
-
-Try
-Datalore — an
-online
-environment
-for Jupyter notebooks in the browser
-
-Also
-read
-more
-about
-JetBrains
-Data
-Solutions
-on
-our
-website
-
 import cv2
 import numpy as np
 from sklearn.cluster import KMeans
@@ -44,10 +8,27 @@ import imageio.v2 as imageio
 import os
 import math
 
+'''This module requires cv2, numpy, sklearn, collections, PIL, imageio, os and math to be installed. It defines three functions: find_vector_set, find_FVS, and clustering, which are used for various steps in the change detection process.
 
-def find_PCAKmeans(imagepath1, imagepath2):
+The find_PCAKmeans function is the main function that takes two image paths as inputs and performs change detection using PCA and K-means. It reads the images, resizes them, calculates the difference image, performs PCA on the difference image, and prepares the feature vector space (FVS).
+
+The find_vector_set function divides the difference image into smaller blocks, extracts feature vectors from each block, and calculates the mean vector from all the feature vectors.
+
+The find_FVS function extracts blocks from the difference image, flattens them into feature vectors, combines them into a feature vector space, and transforms the feature vector space using PCA by multiplying it with the eigenvectors and subtracting the mean vector.
+
+The clustering function performs K-means clustering on the feature vector space. It assigns each feature vector to a cluster, identifies the least common cluster as a reference for change detection, reshapes the cluster assignments into a change map, and returns the least common cluster index and the change map.
+
+The module also includes some additional code to save the change map and clean change map as image files.
+
+Finally, it provides the image paths and call them in the find_PCAKmeans function.
+
+This code is an adaptation of the code provided in GitHub by Abhujeet Kumar on 25 November 2017. (Change-Detection-In-Satellite_Imagery)'''
+
+def find_PCAKmeans(imagepath1, imagepath2):   # Function to find changes using PCA and K-means
     print('Operating')
-
+    """
+   Further information can be found by calling the help function for PCSKmeans_updatedCN module.    
+    """ 
     image1 = cv2.imread(imagepath1)
     image2 = cv2.imread(imagepath2)
     print(image1.shape, image2.shape)
@@ -88,14 +69,17 @@ def find_PCAKmeans(imagepath1, imagepath2):
     cv2.imwrite("data_files/test_data/cleanchangemap.jpg", cleanChangeMap)
 
 
-def find_vector_set(diff_image, new_size):
-    block_size = 5
+def find_vector_set(diff_image, new_size):   # Function to find the vector set and mean vector from the difference image)    
+    """
+      Further information can be found by calling the help function for PCSKmeans_updatedCN module.    
+    """   
+    block_size = 5  
     num_blocks = (new_size[0] // block_size) * (new_size[1] // block_size)
 
     vector_set = np.empty((num_blocks, block_size * block_size), dtype=np.int16)
     idx = 0
 
-    for i in range(new_size[0] // block_size):
+    for i in range(new_size[0] // block_size):    # Divide the difference image into blocks and extract features from each block
         for j in range(new_size[1] // block_size):
             block = diff_image[i * block_size:(i + 1) * block_size, j * block_size:(j + 1) * block_size]
             feature = block.flatten()
@@ -106,7 +90,10 @@ def find_vector_set(diff_image, new_size):
     return vector_set, mean_vec
 
 
-def find_FVS(EVS, diff_image, mean_vec, new):
+def find_FVS(EVS, diff_image, mean_vec, new):   # Function to find the feature vector space (FVS) from the EVS, difference image, mean vector, and new size 
+    """
+      Further information can be found by calling the help function for PCSKmeans_updatedCN module. 
+    """ 
     i = 2
     feature_vector_set = []
 
@@ -126,8 +113,10 @@ def find_FVS(EVS, diff_image, mean_vec, new):
     print("\nfeature vector space size", FVS.shape)
     return FVS
 
-
-def clustering(FVS, components, new):
+def clustering(FVS, components, new):   # Function to perform k-means clustering on the feature vector space (FVS)
+    """
+    Further information can be found by calling the help function for PCSKmeans_updatedCN module.
+    """
     kmeans = KMeans(components, verbose=0)
     kmeans.fit(FVS)
     output = kmeans.predict(FVS)
@@ -136,69 +125,13 @@ def clustering(FVS, components, new):
     least_index = min(count, key=count.get)
     print(new[0], new[1])
     change_map = np.reshape(output, (new[0] - 4, new[1] - 4, -1))  # this has been changed and should be checked
-
     return least_index, change_map
 
-
-# Get the absolute path to the directory containing the image files
-directory = os.path.abspath('data_files/test_data')
+directory = os.path.abspath('data_files/test_data')   # Get the absolute path to the directory containing the image files
 
 if __name__ == "__main__":
     imagepath1 = os.path.join(directory, '20200327.jpeg')  # Construct the absolute paths to the image files
     imagepath2 = os.path.join(directory, '20230208.jpeg')  # Construct the absolute paths to the image files
     find_PCAKmeans(imagepath1, imagepath2)
-Stacking
-Bands
-from stack_bands import band_stacking_three_bands
-
-band_files = (
-'data_files/R10m/T30UWB_20221207T111339_B03_10m.jp2', 'data_files/R10m/T30UWB_20221207T111339_B04_10m.jp2',
-'data_files/R10m/T30UWB_20221207T111339_B08_10m.jp2')
-output_tiff = 'data_files/R10m/T30UWB_20221207T111339.tif'
-output_jpg = 'data_files/test_data/Img2a.jpg'
-
-band_stacking_three_bands(band_files, output_tiff, output_jpg)
-# this works and also converts the tiff to a jpeg
-import rasterio
-import numpy as np
-
-band_files = (
-'data_files/R10m/T30UWB_20221207T111339_B03_10m.jp2', 'data_files/R10m/T30UWB_20221207T111339_B04_10m.jp2',
-'data_files/R10m/T30UWB_20221207T111339_B08_10m.jp2')
-output_tiff = 'data_files/test_data/Img2a.tif'
-output_jpg = 'data_files/test_data/Img2a.jpg'
-
-# Create an empty array to store the band data
-stacked_data = []
-
-# Read each band file and stack the data
-for i, band_file in enumerate(band_files):
-    with rasterio.open(band_file) as band_src:
-        band_data = band_src.read(1)  # Read the band data
-        stacked_data.append(band_data)
-
-# Open one of the band files to get the metadata
-with rasterio.open(band_files[0]) as src:
-    # Read the metadata
-    meta = src.meta
-
-# Update the metadata for the output TIFF file
-meta.update(count=len(stacked_data))
-
-# Write the stacked data to the output TIFF file
-with rasterio.open(output_tiff, 'w', **meta) as dst:
-    dst.write(np.array(stacked_data))
-
-# Convert the GeoTIFF to JPEG
-with rasterio.open(output_tiff) as src:
-    profile = src.profile
-    # Read the data from the GeoTIFF
-    data = src.read()
-
-# Convert the data to the 0-255 range
-data = (data * 255 / data.max()).astype(np.uint8)
-
-# Write the data to the JPEG file
-with rasterio.open(output_jpg, 'w', driver='JPEG', width=profile['width'], height=profile['height'],
-                   count=profile['count'], dtype='uint8') as dst:
-    dst.write(data)
+    
+print("Code execution complete.")

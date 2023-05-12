@@ -10,3 +10,25 @@ __pycache__/
 .ipynb_checkpoints
 .SAFE/
 
+.ipynb_checkpoints/Water Consumption Analysis Dashboard -checkpoint.ipynb
+*.ipynb
+*.cpg
+*.xml
+*.sbn
+*.sbx
+*.zip
+*.pdf
+*.docx
+Assessments/EA_WaterResourceZoneGISDataWRMP19_SHP_Full/docs/OS_Copyright_Statement.txt
+*.gpkg
+*.jp2
+*.jpg
+*.jpeg
+*.safe
+.ipynb_checkpoints/Water Consumption Analysis Dashboard -checkpoint.ipynb
+*.csv
+*.png
+*.xlsx
+*.geojson
+*.html
+*.css
