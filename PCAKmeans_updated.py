@@ -65,8 +65,8 @@ def find_PCAKmeans(imagepath1, imagepath2):   # Function to find changes using P
                          (0, 1, 1, 1, 0),
                          (0, 0, 1, 0, 0)), dtype=np.uint8)
     cleanChangeMap = cv2.erode(change_map, kernel)
-    cv2.imwrite("data_files/test_data/changemap.jpg", change_map)
-    cv2.imwrite("data_files/test_data/cleanchangemap.jpg", cleanChangeMap)
+    cv2.imwrite("data_files/changemap.jpg", change_map)
+    cv2.imwrite("data_files/cleanchangemap.jpg", cleanChangeMap)
 
 
 def find_vector_set(diff_image, new_size):   # Function to find the vector set and mean vector from the difference image)    
@@ -113,11 +113,11 @@ def find_FVS(EVS, diff_image, mean_vec, new):   # Function to find the feature v
     print("\nfeature vector space size", FVS.shape)
     return FVS
 
-def clustering(FVS, components, new):   # Function to perform k-means clustering on the feature vector space (FVS)
+def clustering(FVS, components, new):
     """
     Further information can be found by calling the help function for PCSKmeans_updatedCN module.
     """
-    kmeans = KMeans(components, verbose=0)
+    kmeans = KMeans(n_clusters=components, n_init=10, verbose=0)  # Set n_init parameter explicitly
     kmeans.fit(FVS)
     output = kmeans.predict(FVS)
     count = Counter(output)

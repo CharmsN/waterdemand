@@ -1,3 +1,4 @@
+import functions
 import geopandas as gpd
 from sentinelsat import SentinelAPI, make_path_filter
 from IPython import display
@@ -57,13 +58,26 @@ def download_best_overlap_image(company_detail,date_start,date_end):
     nresults = len(products) # get the number of results found
     print('Found {} results'.format(nresults)) # show the number of results found 
     if nresults == 0:
-        print('No images in this range')
+        print('No images in this range')   # this is to show that no results were found
 
     results = next(iter(products)) # gets the second item from the dict
     products[results] # show the metadata for the second item
 
     qlook = api.download_quicklook(results) # download the quicklook image for this first result 
     display.Image(qlook['path']) # display the image 
+    
+     # Retrieve the downloaded image path
+    qlook = api.download_quicklook(results)
+    image_path = qlook['path']
+
+    print("Image path:", image_path)  # Print the image path for debugging
+    
+    # Check if the image file exists
+    if os.path.exists(image_path):
+        # Display the image
+        display.Image(image_path)
+    else:
+        print('Image file not found at:', image_path)
 
     product_geo = SentinelAPI.to_geodataframe(products) # convert the search results to a geodataframe
     product_geo.head() # show the first 5 rows of the geodataframe
@@ -77,8 +91,13 @@ def download_best_overlap_image(company_detail,date_start,date_end):
 
     # work out the max overlap and return the index
     max_index = product_geo.overlap.argmax() # get the integer location of the largest overlap value
-    # print(max_index) 
+    print(max_index) 
+    
+    best_overlap = product_geo.index[max_index] # get the actual index (image name) with the largest overlap
+    print(product_geo.loc[best_overlap]) # show the metadata for the image with the largest overlap
 
+    api.download(best_overlap) # downloads the first result
+    
     #uncomment this section only if you want to download the results for all matches
     #api.download_all(products,
                  #n_concurrent_dl=5, # allow up to 5 concurrent downloads

@@ -1,60 +1,33 @@
 import os
-import pandas as pd
 import geopandas as gpd
 import pandas as pd
-import numpy as np
 from scipy.stats import pearsonr
-from shapely.ops import unary_union
+from functions import read_water_resource_zones
 
 """
-This script processes water company data and land use data to analyze correlations between different variables.
+This code performs data processing and analysis on water company data and land use data.
 
-Inputs:
-- 'data_files/WaterSupplyAreas_incNAVs v1_4.shp': Shapefile containing water company data.
-- 'data_files/correlation_data.csv': CSV file containing correlation data.
-- 'data_files/clc2018_uk.shp': Shapefile containing land use data.
-- 'data_files/legend.csv': CSV file containing land use category labels.
+1. Load water company data and filter it based on specific area types.
+2. Perform union operation on the geometries of water company groups.
+3. Create a new GeoDataFrame with the unioned geometries for each company.
+4. Append correlation data to the water company GeoDataFrame.
+5. Convert certain columns to numeric and filter out NaN values.
+6. Calculate the Pearson correlation coefficient between household population and consumption.
+7. Load land use data and merge it with the water company GeoDataFrame.
+8. Perform a spatial join between water companies and land use data.
+9. Group the data by company and land use label, and sum the area column.
+10. Create a new GeoDataFrame with the grouped data and centroid geometry.
+11. Filter the rows with 'urban' land use.
+12. Calculate the total area of urban land use for each company.
+13. Calculate the Pearson correlation coefficient between household consumption and urban land use area.
 
-Outputs:
-- 'data_files_correlate.shp': Shapefile containing merged water company data with correlation information.
-
-Process:
-1. Loads water company data from the shapefile and removes unnecessary columns.
-2. Filters the data to select features with specific area types.
-3. Fixes an issue with a specific record in the 'COMPANY' column.
-4. Performs a union operation on the geometries based on the 'COMPANY' column.
-5. Creates a new GeoDataFrame with the unioned geometries for each company.
-6. Loads correlation data from a CSV file and merges it with the water company data.
-7. Converts specific columns to numeric values and filters out NaN values.
-8. Calculates the Pearson correlation coefficient between household population and household consumption.
-9. Loads land use data from a shapefile and merges it with a CSV file containing labels.
-10. Drops unnecessary columns from the merged land use data.
-11. Performs a spatial join between the water company data and merged land use data.
-12. Groups the data by company and land use label, summing the 'Area_Ha' column.
-13. Creates a new GeoDataFrame with the grouped data, setting the geometry as the centroid of each land use label.
-14. Filters the rows where the land use label includes 'urban'.
-15. Groups the rows by company and calculates the sum of the 'Area_Ha' column for each group.
-16. Rounds the values in the 'Area_Ha' column to 2 significant digits.
-17. Merges the water company data with the area by company data.
-18. Calculates the Pearson correlation coefficient between household consumption and area of urban land use.
-19. Calculates household consumption per hectare in liters per day for land classified as 'urban use'.
-20. Adds a new column to the data containing household consumption per hectare in liters per day.
-21. Returns the updated water company data with the additional column.
-
-Note: The code includes references to Amiya Rout's contributions on geeksforgeeks.org for the Pearson correlation calculation.
-
-Author: [Charmaine Newmarch]
-Date: [11 May 2023]
+The Pearson's Correlation Coefficient code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 """
 
+water_area_file = 'data_files/WaterSupplyAreas_incNAVs v1_4.shp'
 
 # Load water company data as wrz, remove unnecessary columns
-wrz = gpd.read_file(os.path.abspath('data_files/WaterSupplyAreas_incNAVs v1_4.shp'))
-# List of columns to be removed
-columns_to_remove = ['Disclaimer', 'Disclaim2', 'Disclaim3', 'Provenance', 'Licence', 'WARNINGS', 'Revisions', 'AreaServed']
-
-# Drop the columns from the GeoDataFrame
-wrz = wrz.drop(columns=columns_to_remove)
+wrz = read_water_resource_zones(water_area_file)
 
 included_area_types = ['regional water and sewerage company', 'regional water only company'] # Filter the GeoDataFrame to select the features with "Northumbrian Water"
 
@@ -160,4 +133,4 @@ list3 = correlate_landuse['Area_Ha']
 corr, _ = pearsonr(list2, list3)
 print('Pearsons correlation for household population and area urban landuse: %.3f' % corr)
 
-# The Pearson's Correlation Coefficient code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
+
