@@ -11,10 +11,7 @@ dependencies:
   - matplotlib
   - Ipython
   - folium
-  - os
-  - folium
   - sentinelsat
   - numpy
-  - sklearn
-  - collections
-  - cv2
+  - skikit-learn
+  - opencv
