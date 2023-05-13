@@ -1,10 +1,7 @@
 import os
-import pandas as pd
 import geopandas as gpd
 import pandas as pd
-import numpy as np
 from scipy.stats import pearsonr
-from shapely.ops import unary_union
 from functions import read_water_resource_zones
 
 """
