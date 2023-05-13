@@ -51,11 +51,22 @@ def plot_chloropleth_map(wrz, pcc_period):
         None
     """
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.set_title(f'Average per capita consumption per water company area for {pcc_period}', fontsize=14)
+    ax.set_title(f'Average per capita consumption per water company area for {pcc_period}', fontsize=14, pad=20)
     wrz.plot(column=pcc_period, cmap='viridis', linewidth=0.8, edgecolor='black', legend=True, ax=ax)
     ax.set_xlabel('Longitude')
     ax.set_ylabel('Latitude')
     ax.spines['top'].set_visible(True)
+    ax.grid(True)  # Add gridlines
+    
+    # Add labels for each water company area - this is commented out as the labels are obscuring the map. This can be uncommented if the outline is restricted to one water company area. 
+    #for idx, row in wrz.iterrows():
+        #centroid = row['geometry'].centroid
+        #ax.annotate(text=row['COMPANY'], xy=(centroid.x, centroid.y), xytext=(3, 3),
+                    #textcoords="offset points", ha='center', va='center', zorder=5)
+
+    # Adjust the aspect ratio to prevent label distortion
+    ax.set_aspect('equal')
+        
     plt.show()
     
 def plot_folium_map(wrz, history_file, pcc_period):
