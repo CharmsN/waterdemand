@@ -1,5 +1,6 @@
-# Welcome to GitHub Desktop!
+# Understanding Water Consumption
 
-This is your README. READMEs are where you can communicate what your project is and how to use it.
+Please work through the Jupyter Notebook Tutorial called Tutorial_Water_Demand.ipynb if you are interested in this topic and would like to contribute.
 
-Write your name on line 6, save it, and then head back to GitHub Desktop.
+
+Charmaine Newmarch, 13 May 2023
