@@ -3,10 +3,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from collections import Counter
-from PIL import Image
-import imageio.v2 as imageio
 import os
-import math
 
 '''This module requires cv2, numpy, sklearn, collections, PIL, imageio, os and math to be installed. It defines three functions: find_vector_set, find_FVS, and clustering, which are used for various steps in the change detection process.
 
