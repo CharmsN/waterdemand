@@ -9,7 +9,6 @@
 __pycache__/
 .ipynb_checkpoints
 .SAFE/
-
 .ipynb_checkpoints/Water Consumption Analysis Dashboard -checkpoint.ipynb
 *.ipynb
 *.cpg
