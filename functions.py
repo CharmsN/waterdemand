@@ -9,10 +9,10 @@ def read_water_resource_zones(water_areas_file):
     """
     Read water resource zones shapefile and remove unnecessary columns.
 
-    Args:
+    Input:
         water_areas_file (str): The file path of the water areas shapefile.
 
-    Returns:
+    Output:
         gpd.GeoDataFrame: The geodataframe containing water resource zone data.
     """
     wrz = gpd.read_file(os.path.abspath(water_areas_file))
@@ -24,12 +24,12 @@ def merge_pcc_data(wrz, history_file, pcc_period):
     """
     Merge per capita consumption (PCC) data with water resource zones based on company identifiers.
 
-    Args:
+    Input:
         water_resource_zones (gpd.GeoDataFrame): The geodataframe containing water resource zone data.
         history_file (str): The file path of the history file.
         pcc_period (str): The specific time period for which the PCC data is being visualized.
 
-    Returns:
+    Output:
         gpd.GeoDataFrame: The geodataframe with merged PCC data.
     """
     pcc_data = pd.read_csv(history_file)
