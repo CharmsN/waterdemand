@@ -49,21 +49,23 @@ for group_name, group_data in grouped_wrz:
     unioned_geometry = group_data['geometry'].unary_union
     merged_geometries[group_name] = unioned_geometry
     acronyms.append(group_data['Acronym'].iloc[0])
+    
 # Create a new GeoDataFrame with the unioned geometries for each company
 merged_wrz_companies = gpd.GeoDataFrame(geometry=merged_geometries.values, index=merged_geometries.index)
 merged_wrz_companies['COMPANY'] = merged_geometries.index
 merged_wrz_companies['Acronym'] = acronyms
-
 merged_wrz_companies
+
 # Append Correlation data to the wrz geodataframe
 # Load the CSV file
 correlation_data = pd.read_csv('data_files/correlation_data.csv', thousands=',')  
 correlation_data
+
 # Perform the merge
 correlate = merged_wrz_companies.merge(correlation_data[['Company', 'hh_cons', 'hh_pop']], how='left', left_on='Acronym', right_on='Company')
-
 correlate.to_file('data_files_correlate.shp')
 correlate
+
 # Convert the hh_pop and hh_cons columns to numeric
 correlate['hh_pop'] = pd.to_numeric(correlate['hh_pop'], errors='coerce')
 correlate['hh_cons'] = pd.to_numeric(correlate['hh_cons'], errors='coerce')
@@ -71,6 +73,7 @@ correlate['hh_cons'] = pd.to_numeric(correlate['hh_cons'], errors='coerce')
 # Filter out NaN values
 correlate = correlate.dropna()
 correlate
+
 # Convert dataframe into series
 list1 = correlate['hh_pop']
 list2 = correlate['hh_cons']
@@ -79,17 +82,18 @@ list2 = correlate['hh_cons']
 corr, _ = pearsonr(list1, list2)
 print('Pearsons correlation for household population and household consumption: %.3f' % corr)
 
-# This code is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
+# The code for pearsonr() is contributed by Amiya Rout (ref: https://www.geeksforgeeks.org/python-pearson-correlation-test-between-two-variables/)
 
 # Load landuse data
 landuse = gpd.read_file(os.path.abspath('data_files/clc2018_uk.shp'))
+
 # Load the CSV file
 landuse_categories = pd.read_csv('data_files/legend.csv')
 # print(landuse_categories.head())  #show a sample of the CSV file 
+
 # merge the csv file with the geodataframe to include the labels for the landuse in the geodataframe
 landuse_categories['CODE'] = landuse_categories['CODE'].astype(str)
 merged_landuse = pd.merge(landuse, landuse_categories, left_on='CODE_18', right_on='CODE')
-
 # Drop unnecessary columns - this cleans the dataset to make it easier to work with
 merged_landuse = merged_landuse.drop(['CODE_18', 'CODE', 'Unnamed: 4', 'Unnamed: 5'], axis=1)
 merged_landuse
@@ -97,6 +101,7 @@ merged_landuse
 label_column = merged_landuse['LABEL']
 merged_wrz_companies = merged_wrz_companies.set_crs(wrz.crs)
 # print(merged_landuse.crs == merged_wrz_companies.crs) # test if the crs is the same 
+
 # Perform spatial join between wrz and merged_landuse
 join = gpd.sjoin(merged_wrz_companies, merged_landuse, how='inner', predicate='intersects')
 # Group by COMPANY and LABEL, and sum the Area_Ha column
